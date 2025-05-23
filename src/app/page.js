@@ -16,20 +16,9 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="p-6 text-white">
+    <main className="max-w-7xl mx-auto px-6 py-10">
       <h1 className="text-3xl font-bold mb-6">Espacios disponibles</h1>
-      <button
-          onClick={async () => {
-            await supabase.auth.signOut()
-            window.location.reload()
-          }}
-          className="text-sm underline text-red-400"
-        >
-          Cerrar sesión
-        </button>
-      <Link href="/host/new" className="underline text-sm text-gray-400 mb-6 inline-block">
-        + Publicar nuevo espacio
-      </Link>
+      
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {spaces.map((space) => (

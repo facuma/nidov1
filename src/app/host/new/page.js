@@ -1,10 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function NewSpace() {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAccess = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      // Redirige si el email no está confirmado
+      if (!user.email_confirmed_at) {
+        router.push('/verificacion-requerida')
+        return
+      }
+
+      setUser(user)
+      setLoading(false)
+    }
+
+    checkAccess()
+  }, [router])
+
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -12,8 +38,6 @@ export default function NewSpace() {
     price: '',
     image: ''
   })
-
-  const router = useRouter()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -23,15 +47,18 @@ export default function NewSpace() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { error } = await supabase.from('spaces').insert([form])
+    const { error } = await supabase.from('spaces').insert([
+      { ...form, owner_id: user.id }
+    ])
 
     if (error) {
-      alert('Error al guardar el espacio')
-      console.error(error)
+      alert('Error al guardar')
     } else {
       router.push('/')
     }
   }
+
+  if (loading) return <p className="text-white p-6">Cargando...</p>
 
   return (
     <div className="max-w-xl mx-auto p-6 text-white">

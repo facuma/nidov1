@@ -1,30 +1,51 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useParams, useRouter } from 'next/navigation'
+import BookingForm from '@/components/BookingForm'
 
-export async function generateStaticParams() {
-  const { data: spaces } = await supabase.from('spaces').select('id')
-  return spaces?.map((space) => ({ id: space.id })) || []
-}
 
-export default async function SpaceDetail({ params }) {
-  const { id } = params
-  const { data: space, error } = await supabase
-    .from('spaces')
-    .select('*')
-    .eq('id', id)
-    .single()
 
-  if (error || !space) {
-    return <div className="p-6 text-white">Espacio no encontrado.</div>
-  }
+export default function SpaceDetail() {
+  const { id } = useParams()
+  const router = useRouter()
+
+  const [space, setSpace] = useState(null)
+  const [user, setUser] = useState(null)
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await supabase.from('spaces').select('*').eq('id', id).single()
+      setSpace(data)
+
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+
+    fetchData()
+  }, [id])
+
+
+  if (!space) return <p className="text-gray-500">Cargando espacio...</p>
+
+
 
   return (
-    <div className="p-6 text-white">
-      <img src={space.image} alt={space.title} className="w-full h-64 object-cover rounded mb-6" />
-      <h1 className="text-3xl font-bold">{space.title}</h1>
-      <p className="text-gray-400 mt-2">{space.location}</p>
-      <p className="mt-4">{space.description}</p>
-      <p className="mt-4 text-xl font-semibold">${space.price} / día</p>
-      <button className="mt-6 px-4 py-2 bg-white text-black rounded hover:bg-gray-200">Reservar ahora</button>
+    <div className="grid md:grid-cols-2 gap-10">
+      {/* Detalle */}
+      <div>
+        <img src={space.image} className="w-full h-64 object-cover rounded mb-6" />
+        <h1 className="text-3xl font-bold mb-2">{space.title}</h1>
+        <p className="text-gray-500">{space.location}</p>
+        <p className="mt-4">{space.description}</p>
+        <p className="mt-4 text-lg font-semibold">${space.price} / hora</p>
+      </div>
+
+      {/* Formulario */}
+      <BookingForm space={space} />
     </div>
   )
 }
