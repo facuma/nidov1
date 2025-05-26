@@ -1,14 +1,51 @@
 @import "tailwindcss";
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,700,900,400i,700i,900i&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,700,900&display=swap');
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #FAF8F6;
+  --color-text: #000000;
+  --color-accent: #FFD500;
+  --color-muted: #E6E6E6;
+  --color-dark: #2B2B2B;
+
+  --font-display: 'Satoshi', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+body, .nav {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  
+}
+
+h1, h2, .logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.logo-1 { font-family: 'Satoshi', sans-serif;
+font-weight: 900;
+font-style: italic;}
+
+
+.accent {
+  background-color: #FFD500;
+}
+
+.text-accent {
+  color: var(--color-accent)
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-display);
   --font-mono: var(--font-geist-mono);
 }
 
