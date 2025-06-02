@@ -1,6 +1,4 @@
-'use client'
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { parse } from 'date-fns'
 
@@ -20,29 +18,38 @@ function toMinutes(timeString) {
 export function useFetchSpaces({ lugar = '', fecha = '', hora = '', activity = '' }) {
   const [spaces, setSpaces] = useState([])
   const [loading, setLoading] = useState(true)
+  const cache = useRef({ data: null, timestamp: 0, query: '' })
 
-  useEffect(() => {
-    async function fetchSpaces() {
-      setLoading(true)
+  const fetchSpaces = useCallback(async () => {
+    const queryKey = JSON.stringify({ lugar, fecha, hora, activity })
+    const now = Date.now()
 
-      // Query base: incluye la columna `activity`
+    // Reusar caché si es reciente y mismo query
+    if (
+      cache.current.data &&
+      now - cache.current.timestamp < 30000 &&
+      cache.current.query === queryKey
+    ) {
+      setSpaces(cache.current.data)
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      // Traer solo campos necesarios
       let query = supabase
         .from('spaces')
-        .select('*, images(url), availability(*), activity')
+        .select('id, title, price, address, status, images(url), availability(*), activity')
         .eq('status', 'published')
 
-      // Filtrar por activity si aplica
       if (activity && activity !== 'all') {
         query = query.eq('activity', activity)
       }
 
       const { data, error } = await query
-      if (error) {
-        console.error('Error al traer espacios:', error)
-        setSpaces([])
-        setLoading(false)
-        return
-      }
+      if (error) throw error
 
       let filtered = Array.isArray(data) ? data : []
 
@@ -54,7 +61,7 @@ export function useFetchSpaces({ lugar = '', fecha = '', hora = '', activity = '
         )
       }
 
-      // Filtrar por fecha (disponibilidad)
+      // Filtrar por fecha
       if (fecha) {
         const selectedDate = parse(fecha, 'yyyy-MM-dd', new Date())
         const dayOfWeek = selectedDate.getDay()
@@ -75,12 +82,20 @@ export function useFetchSpaces({ lugar = '', fecha = '', hora = '', activity = '
         )
       }
 
+      // Actualizar caché
+      cache.current = { data: filtered, timestamp: now, query: queryKey }
       setSpaces(filtered)
+    } catch (err) {
+      console.error('Error al cargar espacios:', err)
+      setSpaces([])
+    } finally {
       setLoading(false)
     }
-
-    fetchSpaces()
   }, [lugar, fecha, hora, activity])
+
+  useEffect(() => {
+    fetchSpaces()
+  }, [fetchSpaces])
 
   return { spaces, loading }
 }

@@ -17,6 +17,7 @@ export async function GET(request) {
     .select('id, space_id, host_id, guest_id, host:host_id(first_name), guest:guest_id(first_name), created_at')
     .or(`host_id.eq.${user.id},guest_id.eq.${user.id}`)
     .order('created_at', { ascending: false })
+    .limit(10)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ conversations })

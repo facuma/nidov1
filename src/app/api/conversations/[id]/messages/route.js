@@ -41,15 +41,21 @@ export async function GET(request, { params }) {
     .from('messages')
     .select('id, sender_id, content, created_at')
     .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false })  // DESC en la DB
+    .limit(50)
+
   if (since) {
+    // Si pasan since, filtramos solo los mensajes más recientes que esa fecha
     query = query.gt('created_at', since)
   }
-  const { data: messages, error: msgError } = await query.order('created_at', { ascending: true })
+
+  const { data: messages, error: msgError } = await query
   if (msgError) {
     return NextResponse.json({ error: msgError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ messages })
+  // Devolver en orden antiguo → nuevo
+  return NextResponse.json({ messages: messages.reverse() })
 }
 
 export async function POST(request, { params }) {

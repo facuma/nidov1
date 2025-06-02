@@ -23,7 +23,7 @@ export default function Navbar() {
   const pathname = usePathname()
 
   // Rutas donde ocultar por completo el navbar
-  const ocultarEn = ['/resumen-reserva', '/pago']
+  const ocultarEn = ['/resumen-reserva', '/pago', '/lp']
   if (ocultarEn.includes(pathname)) return null
 
   const handleLogout = async () => {

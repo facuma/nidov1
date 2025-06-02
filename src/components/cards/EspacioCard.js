@@ -76,11 +76,21 @@ export default function EspacioCard({ space, onRemove }) {
                 alt={space.title}
                 loading="lazy"
                 decoding="async"
+                width={250}
+                height={192}
                 className="w-full h-48 object-cover rounded-xl hover:shadow-md transition"
+                onError={(e) => {
+                  e.target.src = '/placeholder.jpg'
+                }}
+              />
+              <div 
+                className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
+                aria-hidden="true"
               />
               <button
                 onClick={toggleFavorito}
-                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
+                className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-md hover:bg-white transition-colors"
+                aria-label={favorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
               >
                 <Heart
                   size={16}
@@ -90,8 +100,8 @@ export default function EspacioCard({ space, onRemove }) {
             </div>
 
             <div className="mt-2 px-2 pb-4">
-              <p className="text-sm font-semibold text-gray-900 truncate">{space.title}</p>
-              <p className="text-sm text-gray-600">{space.address}</p>
+              <p className="text-sm font-semibold text-gray-900 line-clamp-1">{space.title}</p>
+              <p className="text-sm text-gray-600 line-clamp-1">{space.address}</p>
               <p className="text-sm text-gray-800 mt-1">
                 ${space.price} por 1 hora · <span className="font-medium">★ {space.rating || '4.8'}</span>
               </p>

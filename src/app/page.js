@@ -9,6 +9,7 @@ import SearchBarDesktop from '@/components/ui/SearchBarDesktop'
 import SearchBarMobile from '@/components/ui/SearchBarMobile'
 import ActivityFilter from '@/components/ui/ActivityFilter'
 
+
 export default function HomePage() {
   const search = useSearchParams()
   const lugar = search.get('lugar') || ''

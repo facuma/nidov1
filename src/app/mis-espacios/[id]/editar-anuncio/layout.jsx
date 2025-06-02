@@ -188,7 +188,7 @@ export default function EditarAnuncioLayout({ children }) {
       </div>
 
       {/* BOTONES FIJOS INFERIORES */}
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t z-50 py-4 pb-20 px-6">
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t z-50  pb-20 pt-4 sm:pb-4  px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600 hidden sm:block">
             Completá toda la información requerida para publicar tu anuncio.
